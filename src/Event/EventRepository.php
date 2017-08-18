@@ -6,6 +6,7 @@ namespace Drrcknlsn\CalendarEventApi\Event;
 use DateTime;
 use DateTimeInterface;
 use PDO;
+use PDOException;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -86,17 +87,21 @@ INSERT INTO events (
 )
 SQL;
 
-        $st = $this->conn->prepare($sql);
-        $st->execute([
-            ':actual' => $event->getActual(),
-            ':date' => $event->getDate()
-                ? $event->getDate()->format(DateTime::ISO8601)
-                : null,
-            ':impact' => $event->getImpact(),
-            ':instrument' => $event->getInstrument(),
-            ':forecast' => $event->getForecast(),
-            ':title' => $event->getTitle(),
-        ]);
+        try {
+            $st = $this->conn->prepare($sql);
+            $st->execute([
+                ':actual' => $event->getActual(),
+                ':date' => $event->getDate()
+                    ? $event->getDate()->format(DateTime::ISO8601)
+                    : null,
+                ':impact' => $event->getImpact(),
+                ':instrument' => $event->getInstrument(),
+                ':forecast' => $event->getForecast(),
+                ':title' => $event->getTitle(),
+            ]);
+        } catch (PDOException $e) {
+            throw new RuntimeException('Could not create event', 0, $e);
+        }
 
         return (int)$this->conn->lastInsertId();
     }
@@ -140,8 +145,15 @@ SQL;
             $where
         );
 
-        $st = $this->conn->prepare($sql);
-        $st->execute(array_merge($setParams, $whereParams));
+        try {
+            $st = $this->conn->prepare($sql);
+            $st->execute(array_merge($setParams, $whereParams));
+        } catch (PDOException $e) {
+            throw new RuntimeException(sprintf(
+                'Could not update event: %d',
+                $event->getId()
+            ), 0, $e);
+        }
     }
 
     /**
