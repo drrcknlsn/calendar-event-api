@@ -1,0 +1,27 @@
+{
+  "name": "drrcknlsn/calendar-event-api",
+  "type": "project",
+  "license": "MIT",
+  "authors": [{
+    "name": "Derrick Nelson",
+    "email": "drrcknlsn@gmail.com"
+  }],
+  "require": {
+    "slim/slim": "^3.8",
+    "vlucas/phpdotenv": "^2.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Drrcknlsn\\CalendarEventApi\\": "src/"
+    }
+  },
+  "scripts": {
+    "data": "php app/db/data.php",
+    "schema": "php app/db/schema.php",
+    "start": "php -S 0.0.0.0:3000 -t public public/index.php",
+    "test": "phpunit --colors=always"
+  }
+}
